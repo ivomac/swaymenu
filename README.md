@@ -28,7 +28,7 @@ If the window/workspace/scratchpad window in question is ambiguous, `$MENU` is c
 
 ## Demo
 
-https://github.com/ivomac/swaymenu/assets/45886067/39019a8b-298c-4a9f-bcd8-50ecc71b9951
+[demo](https://github.com/ivomac/swaymenu/assets/45886067/39019a8b-298c-4a9f-bcd8-50ecc71b9951)
 
 ## Config
 
