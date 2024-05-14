@@ -1,18 +1,14 @@
 #!/usr/bin/python
 
-from sys import exit
-from os import getenv
-import subprocess as sp
-
-from json import loads
 import argparse
+import subprocess as sp
+from json import loads
+from os import getenv
+from sys import exit
 
 MENU = getenv("MENU", "dmenu")
-OUTMAP = getenv("SWAYMENU_OUTPUTS", "eDP-1:Laptop")
-
-# '┊│·'
-sep1 = "|"
-sep2 = "|"
+OUTMAP = getenv("SWAYMENU_OUTPUTS", "eDP-1:LAP")
+SEP1, SEP2 = getenv("SWAYMENU_SEPARATORS", "|:|").split(":")
 
 
 def main():
@@ -74,25 +70,24 @@ def main():
     action = parser.parse_args().action
 
     args[action]["cmd"]()
-    return
 
 
 def get_current_output():
     for wk in ipc("get_workspaces"):
         if wk["focused"]:
             return wk["output"]
-    return
+    exit(0)
 
 
 def rename_wk():
-    command("rename workspace to " + menu([], "-p", "rename"))
+    command("rename workspace to " + menu([]))
 
 
 def get_current_wk():
     for wk in ipc("get_workspaces"):
         if wk["focused"]:
             return str(wk["name"])
-    return
+    exit(0)
 
 
 def get_new_wk():
@@ -107,14 +102,11 @@ def get_focused_wk():
     for wk in ipc("get_workspaces"):
         if wk["focused"]:
             return wk["name"]
+    exit(0)
 
 
 def get_visible_wks():
-    return [
-        (wk["name"], wk["output"])
-        for wk in ipc("get_workspaces")
-        if wk["visible"]
-    ]
+    return [(wk["name"], wk["output"]) for wk in ipc("get_workspaces") if wk["visible"]]
 
 
 def get_wk_data():
@@ -137,7 +129,6 @@ def get_wk_wins(wk):
                 wins.append(n)
             else:
                 leaves(n)
-        return
 
     leaves(wk)
 
@@ -145,16 +136,15 @@ def get_wk_wins(wk):
 
 
 def get_wks(
+    *,
     show_output=True,
     show_focused=False,
     show_visible=False,
     show_focused_out=True,
 ):
-    wk_data = dict()
+    wk_data = {}
 
-    out_map = {
-        k: v for line in OUTMAP.split(";") for k, v in [line.split(":")]
-    }
+    out_map = {k: v for line in OUTMAP.split(";") for k, v in [line.split(":")]}
 
     curr_out = get_current_output()
     dw = get_wk_data()
@@ -178,38 +168,30 @@ def get_wks(
                 wk_data[wk["name"]] = ""
                 if len(outputs) > 1:
                     name = out_map.get(out["name"], out["name"])
-
-                    wk_data[wk["name"]] += (
-                        f"{name.ljust(8)}{sep1} " if show_output else ""
-                    )
-                wk_name = f'{wk["name"].ljust(2)}'
+                    wk_data[wk["name"]] += f"{name}{SEP1}" if show_output else ""
+                wk_name = wk["name"]
                 if not wk["name"].isdigit():
                     wk_data[wk["name"]] += f"{wk_name}"
                     continue
 
-                wk_data[wk["name"]] += f" {sep2} ".join(
-                    [win["name"] for win in wins]
-                )
+                wk_data[wk["name"]] += f"{SEP2}".join([win["name"] for win in wins])
     return wk_data
 
 
 def goto_new_wk():
     command(f"workspace {get_new_wk()}")
-    return
 
 
 def change_wk():
     hide_all_float_wins()
     wk = choose(get_wks())
     command(f"workspace {wk}")
-    return
 
 
 def move_focused_win_to_new_wk():
     wk = get_new_wk()
     command(f"move window to workspace {wk}")
     command(f"workspace {wk}")
-    return
 
 
 def permute_wks():
@@ -220,13 +202,11 @@ def permute_wks():
         command(f"workspace --no-auto-back-and-forth {wk}")
         command(f"move workspace to output {wks[n_i][1]}")
     command(f"workspace {focused_wk}")
-    return
 
 
 def give_win():
     wk = choose(get_wks())
     command(f"move window to workspace {wk}")
-    return
 
 
 def move_wk_to_focused_output():
@@ -236,7 +216,6 @@ def move_wk_to_focused_output():
     )
     command(f"workspace {wk}")
     command(f"move workspace to output {out}")
-    return
 
 
 def get_wins(show_visible=False, show_focused=False, show_focused_wk=False):
@@ -258,8 +237,7 @@ def get_wins(show_visible=False, show_focused=False, show_focused_wk=False):
                 continue
 
             is_win = (
-                n["type"] == "con"
-                and len(n["nodes"]) == len(n["floating_nodes"]) == 0
+                n["type"] == "con" and len(n["nodes"]) == len(n["floating_nodes"]) == 0
             )
             if is_win:
                 if wk_name:
@@ -278,20 +256,17 @@ def get_wins(show_visible=False, show_focused=False, show_focused_wk=False):
 def focus_win():
     window = choose(get_wins())
     command(f'[con_id="{window}"] focus')
-    return
 
 
 def swap_wins():
     window = choose(get_wins(show_visible=True))
     command(f"swap container with con_id {window}")
-    return
 
 
 def take_win():
     wk = get_current_wk()
     window = choose(get_wins(show_visible=True))
     command(f"[con_id={window}] move window to workspace {wk}")
-    return
 
 
 def get_float_wins():
@@ -325,7 +300,6 @@ def get_scratch_wins():
                 c += 1
             else:
                 leaves(n)
-        return
 
     for out in ipc("get_tree")["nodes"]:
         if out["name"] == "__i3":
@@ -338,9 +312,6 @@ def focus_float_win():
     win = choose(get_float_wins())
     idn = "con_id"
     command(f"[{idn}={win}] focus")
-    # command(f"[{idn}={win}] resize set 80 ppt 80 ppt")
-    # command(f"[{idn}={win}] move position center")
-    return
 
 
 def hide_all_float_wins():
@@ -348,7 +319,6 @@ def hide_all_float_wins():
         if win["visible"]:
             command('[con_id="{i}"] focus')
             command("move scratchpad")
-    return
 
 
 def command(cmd):
@@ -361,7 +331,7 @@ def ipc(msg_type):
 
 def choose(dic):
     if not dic:
-        raise Exception("No items to choose from.")
+        exit(0)
     elif len(dic) == 1:
         return list(dic.keys())[0]
     chosen_value = menu(dic.values())
@@ -369,7 +339,6 @@ def choose(dic):
     for name, value in dic.items():
         if chosen_value in value:
             return name
-    return
 
 
 def tostr(inp, sep="\n"):

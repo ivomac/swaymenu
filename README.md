@@ -1,3 +1,6 @@
+
+
+
 # Sway Menu
 
 A script to use [sway](https://github.com/swaywm/sway) with a dmenu-like application to choose between windows/workspaces. The purpose is to avoid having workspace-specific bindings like `$mod+1 workspace 1` and never worry about how many workspaces exist or what their names are.
@@ -25,6 +28,7 @@ If the window/workspace/scratchpad window in question is ambiguous, `$MENU` is c
 
 ## Demo
 
+[demo](https://imgur.com/3046CGt)
 
 ## Config
 
