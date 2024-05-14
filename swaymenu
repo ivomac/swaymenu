@@ -206,7 +206,7 @@ def goto_new_wk():
 
 def change_wk():
     hide_all_float_wins()
-    wk = choose(get_wks(), prompt="change")
+    wk = choose(get_wks())
     command(f"workspace {wk}")
     return
 
@@ -230,7 +230,7 @@ def permute_wks():
 
 
 def give_win():
-    wk = choose(get_wks(), prompt="give")
+    wk = choose(get_wks())
     command(f"move window to workspace {wk}")
     return
 
@@ -239,7 +239,6 @@ def move_wk_to_focused_output():
     out = get_current_output()
     wk = choose(
         get_wks(show_focused_out=False, show_visible=True),
-        prompt="bring",
     )
     command(f"workspace {wk}")
     command(f"move workspace to output {out}")
@@ -283,20 +282,20 @@ def get_wins(show_visible=False, show_focused=False, show_focused_wk=False):
 
 
 def focus_win():
-    window = choose(get_wins(), prompt="focus")
+    window = choose(get_wins())
     command(f'[con_id="{window}"] focus')
     return
 
 
 def swap_wins():
-    window = choose(get_wins(show_visible=True), prompt="swap")
+    window = choose(get_wins(show_visible=True))
     command(f"swap container with con_id {window}")
     return
 
 
 def take_win():
     wk = get_current_wk()
-    window = choose(get_wins(show_visible=True), prompt="take")
+    window = choose(get_wins(show_visible=True))
     command(f"[con_id={window}] move window to workspace {wk}")
     return
 
@@ -342,7 +341,7 @@ def get_scratch_wins():
 
 
 def focus_float_win():
-    win = choose(get_float_wins(), prompt="float")
+    win = choose(get_float_wins())
     idn = "con_id"
     command(f"[{idn}={win}] focus")
     # command(f"[{idn}={win}] resize set 80 ppt 80 ppt")
@@ -365,12 +364,12 @@ def ipc(msg_type):
     return loads(call(["swaymsg", "-r", "-t", msg_type]))
 
 
-def choose(dic, prompt="sway", width=default_width):
+def choose(dic):
     if not dic:
         raise Exception("No items to choose from.")
     elif len(dic) == 1:
         return list(dic.keys())[0]
-    chosen_value = menu(dic.values(), "-p", prompt, "-W", width)
+    chosen_value = menu(dic.values())
 
     for name, value in dic.items():
         if value == chosen_value:
