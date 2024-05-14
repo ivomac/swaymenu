@@ -9,8 +9,6 @@ import argparse
 
 MENU = getenv("MENU", "dmenu")
 OUTMAP = getenv("SWAYMENU_OUTPUTS", "eDP-1:Laptop")
-default_width = "40%"
-max_line_len = 62
 
 # '┊│·'
 sep1 = "|"
@@ -190,12 +188,8 @@ def get_wks(
                     continue
 
                 wk_data[wk["name"]] += f" {sep2} ".join(
-                    [
-                        win["name"][: (max_line_len - 10) // len(wins)]
-                        for win in wins
-                    ]
+                    [win["name"] for win in wins]
                 )
-                wk_data[wk["name"]] = wk_data[wk["name"]][:max_line_len]
     return wk_data
 
 
