@@ -345,8 +345,9 @@ def focus_float_win():
 
 def hide_all_float_wins():
     for i, win in get_float_wins().items():
-        command(f"[con_id={i}] focus")
-        command("move scratchpad")
+        if win["visible"]:
+            command('[con_id="{i}"] focus')
+            command("move scratchpad")
     return
 
 
@@ -366,7 +367,7 @@ def choose(dic):
     chosen_value = menu(dic.values())
 
     for name, value in dic.items():
-        if value == chosen_value:
+        if chosen_value in value:
             return name
     return
 
